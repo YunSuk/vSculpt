@@ -13,11 +13,13 @@ public class PauseScreen : MonoBehaviour {
 	{
 		transform.GetChild (0).gameObject.SetActive (true);
 		print ("Stop Recording Button Clicked!");
+		GameObject.Find ("Tool").GetComponent<MouseInputManager> ().enabled = false;
 	}
 
 	public void OnResumeButtonClicked()
 	{
 		transform.GetChild (0).gameObject.SetActive (false);
+		GameObject.Find ("Tool").GetComponent<MouseInputManager> ().enabled = true;
 	}
 
 	public void OnExportModelButtonClicked()
