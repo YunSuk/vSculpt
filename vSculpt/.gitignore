@@ -50,3 +50,5 @@ ehthumbs.db
 #########
 App/
 UWP/
+Ignore/
+Assets/Ignore*
