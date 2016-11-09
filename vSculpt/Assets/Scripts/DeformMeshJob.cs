@@ -19,10 +19,12 @@ public class DeformMeshJob : ThreadedJob
     {
         Debug.Log("ThreadFunction Start");
         float accuracySquare = accuracy * accuracy;
+
         for (int i = 0; i < meshPoints.Length; i++)
         {
             for (int j = 0; j < contactPoints.Length; j++)
             {
+                //float mag = (meshPoints[i] - contactPoints[j]).sqrMagnitude;
                 while ((meshPoints[i] - contactPoints[j]).sqrMagnitude < accuracySquare)
                 {
                     meshPoints[i] += normals[j] * accuracy;
