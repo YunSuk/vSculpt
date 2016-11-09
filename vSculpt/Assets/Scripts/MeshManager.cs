@@ -2,24 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public delegate void CallBack(Vector3[] vecs);
+public delegate void CallBack(Vector3[] verticies, int[] meshTriangles, Vector3[] meshNormals,
+        Vector4[] meshTangents, Vector2[] meshUVs);
 
 public class MeshManager : MonoBehaviour {
 
     public GameObject colliderObject;
-
-    private Dictionary<Vector3, int> pointToMeshPointIndex = new Dictionary<Vector3, int>();
-    private Dictionary<int, int> HullIndexToMeshIndex = new Dictionary<int, int>();
-
-
-    private Vector3[] meshToWorld;
-    private Mesh colliderMesh;
+    
     private Vector3[] colliderMeshPoints;
     private Vector3[] colliderMeshNormals;
+
+    private Vector3[] meshToWorld;
+
     private Mesh meshCopy;
-    private Vector3[] meshPoints;
+    private Vector3[] meshPoints, meshNormals;
+    private int[] meshTriangles;
+    private Vector4[] meshTangents;
+    private Vector2[] meshUVs;
+
     public bool isBusy = false;
     private bool updateMesh = false;
+
     private List<DeformMeshJob> threadJobs = new List<DeformMeshJob>();
     /*
     private static MeshManager _Instance = null;
@@ -41,6 +44,10 @@ public class MeshManager : MonoBehaviour {
         meshCopy = Mesh.Instantiate(filter.sharedMesh);
         filter.sharedMesh = meshCopy;
         meshPoints = filter.sharedMesh.vertices;
+        meshNormals = filter.sharedMesh.normals;
+        meshTriangles = filter.sharedMesh.triangles;
+        meshTangents = filter.sharedMesh.tangents;
+        meshUVs = filter.sharedMesh.uv;
 
         // ASSUMING THAT MESH IS NOT MOVED (TRANSFORM IS NOT AFFECTED)
         meshToWorld = new Vector3[meshPoints.Length];
@@ -50,7 +57,6 @@ public class MeshManager : MonoBehaviour {
         }
 
         filter = colliderObject.GetComponent<MeshFilter>();
-        colliderMesh = filter.sharedMesh;
         colliderMeshPoints = filter.sharedMesh.vertices;
         colliderMeshNormals = filter.sharedMesh.normals;
     }
@@ -65,6 +71,10 @@ public class MeshManager : MonoBehaviour {
             }
             Mesh mesh = GetComponent<MeshFilter>().sharedMesh;
             mesh.vertices = meshPoints;
+            mesh.triangles = meshTriangles;
+            mesh.normals = meshNormals;
+            mesh.tangents = meshTangents;
+            mesh.uv = meshUVs;
             mesh.RecalculateNormals();
             GetComponent<MeshCollider>().sharedMesh = mesh;
             updateMesh = false;
@@ -77,7 +87,7 @@ public class MeshManager : MonoBehaviour {
         
         Vector3[] points = new Vector3[colliderMeshPoints.Length];
         Vector3[] normals = new Vector3[colliderMeshNormals.Length];
-        ContactPoint[] contactPoints = collision.contacts;
+
         for (int i = 0; i < points.Length; i++)
         {
 
@@ -127,16 +137,23 @@ public class MeshManager : MonoBehaviour {
         print("DeformMesh!");
 
         
-        DeformMeshJob job = new DeformMeshJob(meshToWorld, points, normals, DeformMeshCallBack);
+        DeformMeshJob job = new DeformMeshJob(meshToWorld, meshTriangles, meshNormals, meshTangents, meshUVs,
+            points, normals, DeformMeshCallBack);
         threadJobs.Add(job);
         job.Start();
     }
 
-    public void DeformMeshCallBack(Vector3[] vecs)
+    public void DeformMeshCallBack(Vector3[] verticies, int[] meshTriangles, Vector3[] meshNormals,
+        Vector4[] meshTangents, Vector2[] meshUVs)
     {
         print("DeformMeshCallBack!");
         
-        meshToWorld = vecs;
+        meshToWorld = verticies;
+        this.meshTriangles = meshTriangles;
+        this.meshNormals = meshNormals;
+        this.meshTangents = meshTangents;
+        this.meshUVs = meshUVs;
+
         updateMesh = true;
     }
 }
