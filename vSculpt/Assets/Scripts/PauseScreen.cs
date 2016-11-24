@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PauseScreen : MonoBehaviour {
 
+	public GameObject clay;
+
 	// Use this for initialization
 	void Start () {
 		// Deactivate the Pause Screen Components
@@ -24,7 +26,7 @@ public class PauseScreen : MonoBehaviour {
 
 	public void OnExportModelButtonClicked()
 	{
-		// TODO: Do Export Model
+		ObjExporter.DoExportWSubmeshes (clay);
 	}
 
 	public void OnExitButtonClicked()
